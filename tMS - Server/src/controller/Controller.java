@@ -25,22 +25,29 @@ public class Controller {
 	}
 
 	public void mazesCalc() {
-		//v.mazeCalc();
-		
+		v.writeCalculatedMazes();
 	}
 
 	public void solsCalc() {
-		//v.solsCalc();
-		
+		v.writeCalculatedSolutions();
 	}
 
 	public void finishedCalc() {
-		//v.finishedCalc();
+		v.writeToConsole("        << Finished");
 		
 	}
 
 	public void calculating(String string) {
-		//v.displayCalc(string);
+		String[] sp = string.split(",");
+		switch(sp[0]){
+		case "maze":
+			v.writeToConsole("Generating Maze... Client: " + sp[1]);
+			break;
+		case "solution":
+			v.writeToConsole("Solving Maze...  Client: " + sp[1]);
+			break;
+	
+		}
 	}
 
 	public void newClientConnected() {

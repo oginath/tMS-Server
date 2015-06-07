@@ -52,9 +52,10 @@ public class TCPIPServer{
 		}
 		try {
 			server.close();
+			ch.stop();
 			threadPool.shutdown();
 			try {
-				if(threadPool.awaitTermination(800, TimeUnit.MILLISECONDS));
+				if(threadPool.awaitTermination(2, TimeUnit.SECONDS));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -63,7 +64,6 @@ public class TCPIPServer{
 
 	public void stopServer() {
 		stopped = true;
-		ch.stop();
 	}
 	
 	public List<String> getClients(){

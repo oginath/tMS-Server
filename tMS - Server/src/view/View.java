@@ -8,4 +8,7 @@ public interface View {
 	public void start();
 	void setClientNum(int num);
 	void drawClientText();
+	void writeCalculatedMazes();
+	void writeCalculatedSolutions();
+	public void writeToConsole(String string);
 }

@@ -12,7 +12,7 @@ public abstract class BasicWindow extends Observable implements Runnable{
 	public BasicWindow() {
 		this.display = new Display();
 		this.shell = new Shell(display);
-		shell.setSize(700,550);
+		shell.setSize(600,500);
 	}
 	
 	abstract public void initWidgets();

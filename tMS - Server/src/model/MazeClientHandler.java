@@ -29,6 +29,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	private volatile DataManager dm;
 	private volatile MazeGenerator mazeGen;
 	private volatile Searcher searcher;
+	private boolean stopped;
 
 	
 	public MazeClientHandler() {
@@ -52,6 +53,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		
 		mazeGen = null;
 		searcher = null;
+		stopped = false;
 	}
 	
 	@Override
@@ -64,7 +66,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 
 			String str = br.readLine();
 			String[] sp = str.split(" ");
-			while (!sp[0].equals("stop")){
+			while (!sp[0].equals("stop") || !stopped){
 				if (sp[0].equals("genmaze")) {
 					System.out.println("gen maze");//
 					notifyObservers("gmaze " + Client) ;
@@ -172,6 +174,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 
 	@Override
 	public void stop() {
+		stopped = true;
 		if(dm!=null){
 			this.saveMap();
 			dm.shutdown();
