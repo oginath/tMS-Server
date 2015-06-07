@@ -1,9 +1,9 @@
-package model;
+package view;
 
 import controller.Controller;
 
-public interface Model {
+public interface View {
 
 	public void setController(Controller c);
-	public void stop();
+	public void start();
 }

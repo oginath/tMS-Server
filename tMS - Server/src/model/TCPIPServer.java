@@ -5,13 +5,13 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class myTCPIPServer {
+public class TCPIPServer {
 
 	private int port;
 	private volatile boolean stopped;
 	private ClientHandler ch;
 
-	public myTCPIPServer(int port, ClientHandler ch) {
+	public TCPIPServer(int port, ClientHandler ch) {
 		this.port = port;
 		this.ch = ch;
 	}
@@ -43,6 +43,7 @@ public class myTCPIPServer {
 		}
 		try {
 			server.close();
+			//shutdown tp
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
