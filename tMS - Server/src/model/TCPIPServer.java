@@ -43,7 +43,7 @@ public class TCPIPServer {
 		}
 		try {
 			server.close();
-			//shutdown tp
+			//TODO: shutdown tp
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
