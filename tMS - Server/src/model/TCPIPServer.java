@@ -50,14 +50,14 @@ public class TCPIPServer{
 			} catch (IOException e1) {}
 		}
 		try {
-			ch.stop();
-			server.close();
 			threadPool.shutdown();
 			try {
 				if(threadPool.awaitTermination(100, TimeUnit.MILLISECONDS));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			ch.stop();
+			server.close();
 		} catch (IOException e) {e.printStackTrace();}
 	}
 

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,13 +40,13 @@ public class DataManager {
 	private SessionFactory sf = null;
 
 	/** The loaded HashMap */
-	private HashMap<Maze, ArrayList<Solution>> map;
+	private Map<Maze, ArrayList<Solution>> map;
 
 	/**
 	 * Instantiates a new data manager. Loads the necessary configuration file,
 	 * and opens the session for making a transaction with the DB.
 	 */
-	public DataManager() throws JDBCConnectionException{
+	public DataManager() throws JDBCConnectionException {
 		Logger log = Logger.getLogger("org.hibernate");
 		log.setLevel(Level.SEVERE);
 		String filePath = "resources/hibernate.cfg.xml";
@@ -63,7 +65,7 @@ public class DataManager {
 	 * @param map
 	 *            the Map (Maze to it's respective solutions) to save
 	 */
-	public void saveMazeMap(HashMap<Maze, ArrayList<Solution>> map) {
+	public void saveMazeMap(Map<Maze, ArrayList<Solution>> map) {
 
 		session.beginTransaction();
 
@@ -177,9 +179,9 @@ public class DataManager {
 	 *
 	 * @return The hash map from the database.
 	 */
-	public HashMap<Maze, ArrayList<Solution>> loadMazeMap() {
+	public Map<Maze, ArrayList<Solution>> loadMazeMap() {
 
-		map = new HashMap<Maze, ArrayList<Solution>>();
+		map = new ConcurrentHashMap<Maze, ArrayList<Solution>>();
 
 		Query query = session.createQuery("FROM Maze Order by ID desc");
 

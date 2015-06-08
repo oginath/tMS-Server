@@ -8,8 +8,10 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.exception.JDBCConnectionException;
 
@@ -24,7 +26,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 
 	private ArrayList<Observer> observers;
 	private volatile HashMap<String, Maze> nTOm;
-	private volatile HashMap<Maze, ArrayList<Solution>> mTOs;
+	private volatile Map<Maze, ArrayList<Solution>> mTOs;
 	private volatile DataManager dm;
 	private volatile MazeGenerator mazeGen;
 	private volatile Searcher searcher;
@@ -42,7 +44,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		
 		this.nTOm = new HashMap<String, Maze>();
 		if (this.mTOs == null)
-			this.mTOs = new HashMap<Maze, ArrayList<Solution>>();
+			this.mTOs = new ConcurrentHashMap<Maze, ArrayList<Solution>>();
 		else 
 			for (Maze m : mTOs.keySet())
 				nTOm.put(m.getName(), m);		
@@ -105,7 +107,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	public void generateMaze(int rows, int cols, String name) {
 		Maze m = mazeGen.generateMaze(rows, cols);
 		m.setName(name);
-		mTOs.put(m, null);
+		mTOs.put(m, new ArrayList<Solution>());
 		nTOm.put(name, m);
 	}
 	
@@ -127,9 +129,9 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		
 		
 		ArrayList<Solution> sols = mTOs.get(maze);
-		
-		if(sols == null)
-			sols = new ArrayList<Solution>();
+//		
+//		if(sols == null)
+//			sols = new ArrayList<Solution>();
 		
 //		else 
 //			for (Solution solution : sols) {
@@ -175,7 +177,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	 *
 	 * @return the Maze to Solution map
 	 */
-	public HashMap<Maze, ArrayList<Solution>> loadMap() {
+	public Map<Maze, ArrayList<Solution>> loadMap() {
 		return dm.loadMazeMap();
 	}
 
@@ -202,7 +204,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	public void stop() {
 		if(dm!=null){
 			for (Maze m : mTOs.keySet()) 
-				if(mTOs.get(m) == null)
+				if(mTOs.get(m).size() == 0)
 					mTOs.remove(m);
 			
 			this.saveMap();
