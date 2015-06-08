@@ -38,24 +38,23 @@ public class TCPIPServer{
 					@Override
 					public void run() {
 						try {
-							System.out.println("Client Found");
 							ch.handleClient(aClient.getInputStream(), aClient.getOutputStream(), aClient.getInetAddress());
+							cList.remove(aClient.getInetAddress().toString());
 
 							aClient.getOutputStream().close();
 							aClient.getInputStream().close();
 							aClient.close();
-							cList.remove(aClient.getInetAddress().toString());
 						} catch (IOException e) {}
 					}
 				});
 			} catch (IOException e1) {}
 		}
 		try {
-			server.close();
 			ch.stop();
+			server.close();
 			threadPool.shutdown();
 			try {
-				if(threadPool.awaitTermination(2, TimeUnit.SECONDS));
+				if(threadPool.awaitTermination(100, TimeUnit.MILLISECONDS));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

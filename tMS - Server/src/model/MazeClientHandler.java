@@ -8,15 +8,15 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Queue;
 
 import org.hibernate.exception.JDBCConnectionException;
 
 import algorithms.mazeGenerators.Maze;
 import algorithms.mazeGenerators.MazeGenerator;
+import algorithms.search.MazeState;
+import algorithms.search.SearchableMaze;
 import algorithms.search.Searcher;
 import algorithms.search.Solution;
 
@@ -25,12 +25,9 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	private ArrayList<Observer> observers;
 	private volatile HashMap<String, Maze> nTOm;
 	private volatile HashMap<Maze, ArrayList<Solution>> mTOs;
-	private volatile Queue<Maze> mQueue;
 	private volatile DataManager dm;
 	private volatile MazeGenerator mazeGen;
 	private volatile Searcher searcher;
-	private boolean stopped;
-
 	
 	public MazeClientHandler() {
 		observers = new ArrayList<Observer>();
@@ -49,11 +46,9 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		else 
 			for (Maze m : mTOs.keySet())
 				nTOm.put(m.getName(), m);		
-		this.mQueue = new LinkedList<Maze>();
 		
 		mazeGen = null;
 		searcher = null;
-		stopped = false;
 	}
 	
 	@Override
@@ -64,64 +59,95 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			ObjectOutputStream oos = new ObjectOutputStream(out);
 
-			String str = br.readLine();
-			String[] sp = str.split(" ");
-			while (!sp[0].equals("stop") || !stopped){
-				if (sp[0].equals("genmaze")) {
-					System.out.println("gen maze");//
+			String str;
+			String[] sp;
+			while (!((str = br.readLine()).equals("stop"))){
+				sp = str.split(" ");
+				switch (sp[0]){
+				case "genmaze":
 					notifyObservers("gmaze " + Client) ;
 					
-					int rows = Integer.parseInt(sp[1]);
-					int cols = Integer.parseInt(sp[2]);
+					int rows = Integer.parseInt(sp[2]);
+					int cols = Integer.parseInt(sp[3]);
 					
-					generateMaze(rows, cols);
-					
-					//oos.writeObject(m);
+					generateMaze(rows, cols, sp[1]);
 					
 					notifyObservers("finished");
-				} 
-				
-				else if (sp[0].equals("solmaze")) {
-					System.out.println("sol maze");//
+					break;
+					
+				case "solmaze":
 					notifyObservers("smaze " + Client) ;
-					//
-					solveMaze(sp[1]);////------
 					
-					//
+					String string = str.replaceAll(sp[0] + " ", "");
+					solveMaze(string);
+	
 					notifyObservers("finished");
+					break;
+					
+				case "getmaze":
+					oos.writeObject(getMaze(sp[1]));
+					break;
+					
+				case "getsol":
+					oos.writeObject(getSolution(sp[1]));
+					break;
 				}
 				oos.flush();
-				str = br.readLine();
-				sp = str.split(" ");
 			}
-		
-			br.close();
-			oos.close();
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+		notifyObservers("client");
 	}
 	
 	
-	public void generateMaze(int rows, int cols) {
-	
+	public void generateMaze(int rows, int cols, String name) {
 		Maze m = mazeGen.generateMaze(rows, cols);
-		mQueue.add(m);
-
+		m.setName(name);
+		mTOs.put(m, null);
+		nTOm.put(name, m);
 	}
 	
-	public Maze getMaze() {
-		return mQueue.poll();
+	public Maze getMaze(String name) {
+		return nTOm.get(name);
 	}
 	
 	public void solveMaze(String arg){
 		
-		searcher.search(null);
+		String[] sp = arg.split(" ");
+		Maze maze =  nTOm.get(sp[0]);
+		SearchableMaze sm = new SearchableMaze(maze, false);
+		if(sp.length > 1){
+			MazeState sState = new MazeState(sp[1] + " " + sp[2]);
+			MazeState gState = new MazeState(sp[3] + " " + sp[4]);
+			sm.setStartState(sState);
+			sm.setgState(gState);
+		}
+		
+		
+		ArrayList<Solution> sols = mTOs.get(maze);
+		
+		if(sols == null)
+			sols = new ArrayList<Solution>();
+		
+//		else 
+//			for (Solution solution : sols) {
+//				//
+//				//TODO: check if solution exists
+//				//
+//			}
+		
+		Solution s = searcher.search(sm);
+
+		sols.add(s);
+		this.mTOs.remove(maze);
+		this.mTOs.put(maze, sols);
 	}
 	
-	public Solution getSolution(Maze mazeName) {
-		ArrayList<Solution> array = mTOs.get(mazeName);
+	public Solution getSolution(String mazeName) {
+		Maze m = nTOm.get(mazeName);
+		ArrayList<Solution> array = mTOs.get(m);
 		return array.get(array.size()-1);
 	}
 	
@@ -174,8 +200,11 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 
 	@Override
 	public void stop() {
-		stopped = true;
 		if(dm!=null){
+			for (Maze m : mTOs.keySet()) 
+				if(mTOs.get(m) == null)
+					mTOs.remove(m);
+			
 			this.saveMap();
 			dm.shutdown();
 		}

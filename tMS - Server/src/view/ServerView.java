@@ -40,7 +40,7 @@ public class ServerView extends BasicWindow implements View {
 		clientsText = new Text(clientsGroup, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL);
 		clientsText.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		clientsText.setLayoutData(new GridData(GridData.FILL_BOTH));
-		drawClientText();
+		writeClientText();
 		
 		Group calcsGroup = new Group(this.shell, SWT.NULL);
 		calcsGroup.setLayout(new GridLayout(2, false));
@@ -66,17 +66,13 @@ public class ServerView extends BasicWindow implements View {
 	}
 
 	@Override
-	public void setClientNum(int num) {
-		this.numOfClients = num;
-	}
-
-	@Override
-	public void drawClientText() {
+	public void writeClientText() {
 		display.asyncExec(new Runnable() {
 
 			@Override
 			public void run() {
 				List<String> cList = c.getClientList();
+				numOfClients = cList.size();
 				StringBuilder sb = new StringBuilder();
 				sb.append("Clients: " + numOfClients
 						+ System.getProperty("line.separator"));

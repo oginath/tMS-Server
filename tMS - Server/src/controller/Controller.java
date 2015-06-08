@@ -15,20 +15,15 @@ public class Controller {
 		this.v = v;
 	}
 	
-	public int getNumOfClients(){
-		
-		return m.getClientList().size();
-	}
-	
 	public List<String> getClientList(){
 		return m.getClientList();
 	}
 
-	public void mazesCalc() {
+	public void calculatedMazes() {
 		v.writeCalculatedMazes();
 	}
 
-	public void solsCalc() {
+	public void calculatedSolutions() {
 		v.writeCalculatedSolutions();
 	}
 
@@ -51,9 +46,7 @@ public class Controller {
 	}
 
 	public void newClientConnected() {
-		int n = getNumOfClients();
-		v.setClientNum(n);
-		v.drawClientText();
+		v.writeClientText();
 		
 	}
 	
