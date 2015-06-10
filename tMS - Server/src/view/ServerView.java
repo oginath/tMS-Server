@@ -1,5 +1,8 @@
 package view;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -119,7 +122,9 @@ public class ServerView extends BasicWindow implements View {
 
 			@Override
 			public void run() {
-				stringB.append(string + System.getProperty("line.separator"));
+				DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+				Date date = new Date();
+				stringB.append(dateFormat.format(date) + ": " + string + System.getProperty("line.separator"));
 				console.setText(stringB.toString());
 			}
 

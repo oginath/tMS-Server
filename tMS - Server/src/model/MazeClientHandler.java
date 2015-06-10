@@ -1,12 +1,14 @@
 package model;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
@@ -21,6 +23,9 @@ import algorithms.search.MazeState;
 import algorithms.search.SearchableMaze;
 import algorithms.search.Searcher;
 import algorithms.search.Solution;
+
+import compression_algorithms.Compressor;
+import compression_algorithms.HuffmanAlg;
 
 public class MazeClientHandler extends Observable implements ClientHandler {
 
@@ -87,7 +92,17 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 					break;
 					
 				case "getmaze":
-					oos.writeObject(getMaze(sp[1]));
+
+					Maze m = getMaze(sp[1]);
+					ByteArrayOutputStream mazeBaos = new ByteArrayOutputStream();
+					Compressor mazeComp = new HuffmanAlg();
+					
+					ObjectOutputStream mazeOut= new ObjectOutputStream(mazeBaos);
+					mazeOut.writeObject(m);
+					mazeOut.close();
+					
+					oos.writeObject(Base64.getEncoder().encodeToString(mazeComp.compress(mazeBaos.toByteArray())));
+
 					break;
 					
 				case "getsol":
