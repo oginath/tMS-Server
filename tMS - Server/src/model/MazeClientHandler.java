@@ -142,22 +142,39 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 			sm.setgState(gState);
 		}
 		
-		
 		ArrayList<Solution> sols = mTOs.get(maze);
-//		
-//		if(sols == null)
-//			sols = new ArrayList<Solution>();
 		
-//		else 
-//			for (Solution solution : sols) {
-//				//
-//				//TODO: check if solution exists
-//				//
-//			}
+		Solution s = null;
+		boolean flag = true;
+		if(sols.size() != 0) {
+			String sState = sm.getStartState().getState();
+			for (int i = 0; i < sols.size();i++) {
+				for(int j = 0; j < sols.get(i).getSoList().size(); j++){
+					if(sols.get(i).getSoList().get(j).equals(sState)){
+						
+						flag = false;
+						s = new Solution();
+						s.setMazeID(sols.get(i).getMazeID());
+						ArrayList<String> al = new ArrayList<String>();
+						for(int k = 0; k < sols.get(i).getSoList().size(); k++)
+							al.add(sols.get(i).getSoList().get(k));
+						
+						s.setSoList(al);
+						sols.remove(i);
+						sols.add(s);
+						break;
+					}
+				}
+				if(!flag)
+					break;
+			}
+		}
 		
-		Solution s = searcher.search(sm);
-
-		sols.add(s);
+		if(flag){
+			s = searcher.search(sm);
+			sols.add(s);
+		}
+		
 		this.mTOs.remove(maze);
 		this.mTOs.put(maze, sols);
 	}
