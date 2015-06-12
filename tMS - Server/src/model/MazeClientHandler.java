@@ -72,14 +72,19 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 				sp = str.split(" ");
 				switch (sp[0]){
 				case "genmaze":
-					notifyObservers("gmaze " + Client) ;
+					
+					notifyObservers("gmaze " + Client);
 					
 					int rows = Integer.parseInt(sp[2]);
 					int cols = Integer.parseInt(sp[3]);
 					
-					generateMaze(rows, cols, sp[1]);
+					if(generateMaze(rows, cols, sp[1])){
+						oos.writeBoolean(true);
+						notifyObservers("finished");
+					}
+					else
+						oos.writeBoolean(false);
 					
-					notifyObservers("finished");
 					break;
 					
 				case "solmaze":
@@ -94,15 +99,21 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 				case "getmaze":
 
 					Maze m = getMaze(sp[1]);
-					ByteArrayOutputStream mazeBaos = new ByteArrayOutputStream();
-					Compressor mazeComp = new HuffmanAlg();
-					
-					ObjectOutputStream mazeOut= new ObjectOutputStream(mazeBaos);
-					mazeOut.writeObject(m);
-					mazeOut.close();
-					
-					oos.writeObject(Base64.getEncoder().encodeToString(mazeComp.compress(mazeBaos.toByteArray())));
-
+					if(m != null){
+						oos.writeBoolean(true);
+						oos.flush();
+						
+						ByteArrayOutputStream mazeBaos = new ByteArrayOutputStream();
+						Compressor mazeComp = new HuffmanAlg();
+						
+						ObjectOutputStream mazeOut= new ObjectOutputStream(mazeBaos);
+						mazeOut.writeObject(m);
+						mazeOut.close();
+						
+						oos.writeObject(Base64.getEncoder().encodeToString(mazeComp.compress(mazeBaos.toByteArray())));
+					}
+					else
+						oos.writeBoolean(false);
 					break;
 					
 				case "getsol":
@@ -119,11 +130,15 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	}
 	
 	
-	public void generateMaze(int rows, int cols, String name) {
+	public boolean generateMaze(int rows, int cols, String name) {
+		if(nTOm.containsKey(name))
+			return false;
+		
 		Maze m = mazeGen.generateMaze(rows, cols);
 		m.setName(name);
 		mTOs.put(m, new ArrayList<Solution>());
 		nTOm.put(name, m);
+		return true;
 	}
 	
 	public Maze getMaze(String name) {
