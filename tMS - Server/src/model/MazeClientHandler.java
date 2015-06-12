@@ -84,7 +84,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 					
 				case "solmaze":
 					notifyObservers("smaze " + Client) ;
-					
+
 					String string = str.replaceAll(sp[0] + " ", "");
 					solveMaze(string);
 	

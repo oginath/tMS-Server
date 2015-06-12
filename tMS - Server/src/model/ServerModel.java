@@ -18,6 +18,7 @@ public class ServerModel implements Model, Observer {
 		if (ch instanceof MazeClientHandler) {
 			((MazeClientHandler) (ch)).addObserver(this);
 			((MazeClientHandler) (ch)).setMazeGenAlg(m);
+			
 			((MazeClientHandler) (ch)).setSolverAlg(s);
 		}
 
