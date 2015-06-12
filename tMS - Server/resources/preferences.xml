@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_31" class="java.beans.XMLDecoder">
+ <object class="controller.Preferences">
+  <void property="generatorAlg">
+   <object class="algorithms.mazeGenerators.RecursiveBacktrackerMazeGenerator"/>
+  </void>
+  <void property="h">
+   <object class="algorithms.heuristic.MazeEuclideanDistance"/>
+  </void>
+  <void property="numOfThreads">
+   <int>3</int>
+  </void>
+  <void property="port">
+   <int>5400</int>
+  </void>
+  <void property="solverAlg">
+   <class>algorithms.search.AStar</class>
+  </void>
+ </object>
+</java>
