@@ -1,6 +1,7 @@
 package model;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,6 +10,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -41,7 +45,7 @@ public class DataManager {
 
 	/** The loaded HashMap */
 	private Map<Maze, ArrayList<Solution>> map;
-
+	
 	/**
 	 * Instantiates a new data manager. Loads the necessary configuration file,
 	 * and opens the session for making a transaction with the DB.
@@ -288,13 +292,65 @@ public class DataManager {
 		return solutions;
 	}
 
+	public void savePosMap(Map<String, String> map){
+		
+		deleteAllPositions();
+		session.beginTransaction();
+		
+		int i = 0;
+		for(String s : map.keySet()){
+			PosMap p = new PosMap();
+			p.setName(s);
+			p.setPosition(map.get(s));
+			p.setID(i);
+			i++;
+			session.saveOrUpdate(p);
+		}
+		session.getTransaction().commit();
+	}
+	
+	
+	public Map<String, String> loadPosMap(){
+		
+		Query query = this.session.createQuery("FROM DataManager$PosMap Order by ID desc");
+		
+		@SuppressWarnings("unchecked")
+		List<PosMap> poslist = query.list();
+		Iterator<PosMap> posIt = poslist.iterator();
+		
+		Map<String, String> map = new ConcurrentHashMap<String,String>();
+		PosMap pos;
+		while(posIt.hasNext()){
+			pos = posIt.next();
+			map.put(pos.getName(), pos.getPosition());
+		}
+		return map;
+	}
+	
+	public void deleteAllPositions(){
+		
+		session.beginTransaction();
+		Query query = this.session.createQuery("FROM DataManager$PosMap Order by ID desc");
+	
+		@SuppressWarnings("unchecked")
+		List<PosMap> poslist = query.list();
+		Iterator<PosMap> posIt = poslist.iterator();
+		
+		PosMap pos;
+		while(posIt.hasNext()){
+			pos = posIt.next();
+			session.delete(pos);
+		}
+		session.getTransaction().commit();
+	}
+	
 	/**
 	 * Delete all.
 	 * 
 	 * deletes all of the data in the database.
 	 */
 	public void deleteAll() {
-
+		deleteAllPositions();
 		session.beginTransaction();
 		for (Maze maze : map.keySet()) {
 
@@ -316,5 +372,30 @@ public class DataManager {
 	 */
 	public void shutdown() {
 		this.sf.close();
+	}
+	
+	
+	@Entity
+	public static class PosMap implements Serializable{
+		private static final long serialVersionUID = 1L;
+		@Id
+		int ID;
+		String name;
+		String position;
+		
+		public PosMap() {}
+		
+		public String getName() {return name;}
+		public void setName(String name) {this.name = name;}
+		public String getPosition() {return position;}
+		public void setPosition(String position) {this.position = position;}
+		public int getID() {return ID;}
+		public void setID(int iD) {ID = iD;}
+		
+		@Override
+		public int hashCode() {
+			return this.name.hashCode()+this.position.hashCode();
+		}
+
 	}
 }

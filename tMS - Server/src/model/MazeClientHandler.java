@@ -32,6 +32,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	private ArrayList<Observer> observers;
 	private volatile HashMap<String, Maze> nTOm;
 	private volatile Map<Maze, ArrayList<Solution>> mTOs;
+	private volatile Map<String, String> nTOp;
 	private volatile DataManager dm;
 	private volatile MazeGenerator mazeGen;
 	private volatile Searcher searcher;
@@ -41,6 +42,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		try{
 			this.dm = new DataManager();
 			this.mTOs = this.loadMap();
+			this.nTOp = this.loadPosMap();
 		}
 		catch(JDBCConnectionException e){
 				System.out.println("DB ERROR");
@@ -53,6 +55,9 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		else 
 			for (Maze m : mTOs.keySet())
 				nTOm.put(m.getName(), m);		
+		
+		if(this.nTOp == null)
+			this.nTOp = new ConcurrentHashMap<String, String>();
 		
 		mazeGen = null;
 		searcher = null;
@@ -119,6 +124,10 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 				case "getsol":
 					oos.writeObject(getSolution(sp[1]));
 					break;
+					
+				case "getpos":
+					oos.writeObject(getPos(sp[1]));
+					break;
 				}
 				oos.flush();
 			}
@@ -138,6 +147,11 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		m.setName(name);
 		mTOs.put(m, new ArrayList<Solution>());
 		nTOm.put(name, m);
+		
+		SearchableMaze s = new SearchableMaze(m, false);
+		String pos = s.getStartState().getState() + " " + s.getGoalState().getState();
+		nTOp.put(name, pos);
+		
 		return true;
 	}
 	
@@ -200,6 +214,10 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		return array.get(array.size()-1);
 	}
 	
+	public String getPos(String mazeName){
+		return this.nTOp.get(mazeName);
+	}
+	
 	public void setMazeGenAlg(MazeGenerator gen){
 		this.mazeGen = gen;
 	}
@@ -216,6 +234,10 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	public void saveMap() {
 		dm.saveMazeMap(mTOs);
 	}
+	
+	public void savePosMap(){
+		dm.savePosMap(nTOp);
+	}
 
 	/**
 	 * Load map.
@@ -226,6 +248,10 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	 */
 	public Map<Maze, ArrayList<Solution>> loadMap() {
 		return dm.loadMazeMap();
+	}
+	
+	public Map<String, String> loadPosMap(){
+		return dm.loadPosMap();
 	}
 
 	/**
@@ -255,6 +281,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 					mTOs.remove(m);
 			
 			this.saveMap();
+			this.savePosMap();
 			dm.shutdown();
 		}
 	}

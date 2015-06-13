@@ -24,8 +24,9 @@
         </property>
         <property name="hbm2ddl.auto">update</property>
         <!-- Mapping files -->
-		<mapping class="algorithms.mazeGenerators.Maze" />
-		<mapping class="algorithms.mazeGenerators.Cell" />
-		<mapping class="algorithms.search.Solution" />
+		<mapping class="algorithms.mazeGenerators.Maze"/>
+		<mapping class="algorithms.mazeGenerators.Cell"/>
+		<mapping class="algorithms.search.Solution"/>
+		<mapping class="model.DataManager$PosMap"/> 
       </session-factory>
     </hibernate-configuration>
