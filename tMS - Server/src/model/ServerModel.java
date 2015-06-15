@@ -54,12 +54,12 @@ public class ServerModel implements Model, Observer {
 
 		switch (sp[0]) {
 		case "gmaze":
-			c.calculating("maze," + sp[1]);
+			c.calculating("maze," + sp[1].substring(1, sp[1].length()));
 			c.calculatedMazes();
 			break;
 
 		case "smaze":
-			c.calculating("solution," + sp[1]);
+			c.calculating("solution," + sp[1].substring(1, sp[1].length()));
 			c.calculatedSolutions();
 			break;
 

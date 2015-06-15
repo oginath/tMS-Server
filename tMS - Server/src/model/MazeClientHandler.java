@@ -67,7 +67,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	public void handleClient(InputStream in, OutputStream out, Object Client) {
 		notifyObservers("client");
 		try {
-
+			
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			ObjectOutputStream oos = new ObjectOutputStream(out);
 
@@ -104,6 +104,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 				case "getmaze":
 
 					Maze m = getMaze(sp[1]);
+		
 					if(m != null){
 						oos.writeBoolean(true);
 						oos.flush();

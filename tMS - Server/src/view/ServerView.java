@@ -81,7 +81,7 @@ public class ServerView extends BasicWindow implements View {
 						+ System.getProperty("line.separator"));
 				if (!cList.isEmpty()) {
 					for (int i = 0; i < cList.size(); i++) {
-						sb.append(i + 1 + ": " + cList.get(i)
+						sb.append(i + 1 + ": " + cList.get(i).substring(1, cList.get(i).length())
 								+ System.getProperty("line.separator"));
 					}
 				}
