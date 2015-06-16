@@ -43,12 +43,14 @@ public class DataManager {
 	/** The Session Factory. */
 	private SessionFactory sf = null;
 
-	/** The loaded HashMap */
+	/**  The loaded HashMap. */
 	private Map<Maze, ArrayList<Solution>> map;
 	
 	/**
 	 * Instantiates a new data manager. Loads the necessary configuration file,
 	 * and opens the session for making a transaction with the DB.
+	 *
+	 * @throws JDBCConnectionException the JDBC connection exception
 	 */
 	public DataManager() throws JDBCConnectionException {
 		Logger log = Logger.getLogger("org.hibernate");
@@ -74,20 +76,7 @@ public class DataManager {
 		session.beginTransaction();
 
 		for (Maze maze : map.keySet()) {
-
 			this.saveMaze(maze);
-
-			// Query query = session
-			// .createQuery("FROM Solution Order by solID desc");
-			// @SuppressWarnings("unchecked")
-			// List<Solution> soList = query.list();
-			// Iterator<Solution> soIt = soList.iterator();
-			//
-			// int i = 0;
-			// if (soIt.hasNext()) {
-			// sol = soIt.next();
-			// i = sol.getSolID();
-			// }
 
 			Solution sol = null;
 			Iterator<Solution> it = map.get(maze).iterator();
@@ -95,7 +84,7 @@ public class DataManager {
 			while (it.hasNext()) {
 				sol = it.next();
 				sol.setMazeID(maze.getID());
-				// sol.setSolID(++i);
+
 				this.saveSolution(sol);
 			}
 		}
@@ -127,21 +116,6 @@ public class DataManager {
 				cellSet.put(c, c.getID());
 			}
 		}
-
-		// Query query = session.createQuery("FROM Maze Order by ID desc");
-		//
-		// @SuppressWarnings("unchecked")
-		// List<Maze> idList = query.list();
-		// Iterator<Maze> idIt = idList.iterator();
-		//
-		// Integer x = null;
-		// Maze tempMaze = null;
-		// if (idIt.hasNext()) {
-		// tempMaze = idIt.next();
-		// x = tempMaze.getID() + 1;
-		// maze.setID(x);
-		// } else
-		// maze.setID(1);
 
 		maze.setMatrixArray(new byte[maze.getRows() * maze.getCols()]);
 
@@ -292,6 +266,11 @@ public class DataManager {
 		return solutions;
 	}
 
+	/**
+	 * Save the map that matches a name of a maze to the its starting and goal positions.
+	 *
+	 * @param map The map to save.
+	 */
 	public void savePosMap(Map<String, String> map){
 		
 		deleteAllPositions();
@@ -310,6 +289,11 @@ public class DataManager {
 	}
 	
 	
+	/**
+	 * Load the map that matches a name of a maze to the its starting and goal positions.
+	 *
+	 * @return the map
+	 */
 	public Map<String, String> loadPosMap(){
 		
 		Query query = this.session.createQuery("FROM DataManager$PosMap Order by ID desc");
@@ -327,6 +311,9 @@ public class DataManager {
 		return map;
 	}
 	
+	/**
+	 * Delete all positions.
+	 */
 	public void deleteAllPositions(){
 		
 		session.beginTransaction();
@@ -375,21 +362,70 @@ public class DataManager {
 	}
 	
 	
+	/**
+	 * The Class PosMap.
+	 */
 	@Entity
 	public static class PosMap implements Serializable{
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The ID. */
 		@Id
 		int ID;
+		
+		/** The name. */
 		String name;
+		
+		/** The position. */
 		String position;
 		
+		/**
+		 * Instantiates a new position map.
+		 */
 		public PosMap() {}
 		
+		/**
+		 * Gets the name.
+		 *
+		 * @return the name
+		 */
 		public String getName() {return name;}
+		
+		/**
+		 * Sets the name.
+		 *
+		 * @param name the new name
+		 */
 		public void setName(String name) {this.name = name;}
+		
+		/**
+		 * Gets the position.
+		 *
+		 * @return the position
+		 */
 		public String getPosition() {return position;}
+		
+		/**
+		 * Sets the position.
+		 *
+		 * @param position the new position
+		 */
 		public void setPosition(String position) {this.position = position;}
+		
+		/**
+		 * Gets the id.
+		 *
+		 * @return the id
+		 */
 		public int getID() {return ID;}
+		
+		/**
+		 * Sets the id.
+		 *
+		 * @param iD the new id
+		 */
 		public void setID(int iD) {ID = iD;}
 		
 		@Override

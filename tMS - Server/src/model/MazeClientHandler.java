@@ -27,16 +27,41 @@ import algorithms.search.Solution;
 import compression_algorithms.Compressor;
 import compression_algorithms.HuffmanAlg;
 
+/**
+ * The Class MazeClientHandler.
+ * 
+ * Implements Observer pattern with ServerModel.
+ */
 public class MazeClientHandler extends Observable implements ClientHandler {
 
+	/** The Observers of this class */
 	private ArrayList<Observer> observers;
+	
+	/** The string (name) to maze map. */
 	private volatile HashMap<String, Maze> nTOm;
+	
+	/** The maze to array list of solutions map. */
 	private volatile Map<Maze, ArrayList<Solution>> mTOs;
+	
+	/** The name to starting and goal positions map. */
 	private volatile Map<String, String> nTOp;
+	
+	/**
+	 * The DataManger, used to save objects to the DB
+	 * 
+	 * For more information, @see model.DataManager
+	 */
 	private volatile DataManager dm;
+	
+	/** The maze generator algorithm. */
 	private volatile MazeGenerator mazeGen;
+	
+	/** The solver algorithm. */
 	private volatile Searcher searcher;
 	
+	/**
+	 * Instantiates a new maze client handler.
+	 */
 	public MazeClientHandler() {
 		observers = new ArrayList<Observer>();
 		try{
@@ -63,6 +88,9 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		searcher = null;
 	}
 	
+	/** 
+	 * Receives commands from the client and executes them accordingly.
+	 */
 	@Override
 	public void handleClient(InputStream in, OutputStream out, Object Client) {
 		notifyObservers("client");
@@ -140,6 +168,14 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	}
 	
 	
+	/**
+	 * Generate maze.
+	 *
+	 * @param rows the rows of the maze
+	 * @param cols the columns of the maze
+	 * @param name the name of the maze
+	 * @return true, if successful
+	 */
 	public boolean generateMaze(int rows, int cols, String name) {
 		if(nTOm.containsKey(name))
 			return false;
@@ -156,10 +192,24 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		return true;
 	}
 	
+	/**
+	 * Gets the maze.
+	 *
+	 * @param name the name of the maze
+	 * @return the maze
+	 */
 	public Maze getMaze(String name) {
 		return nTOm.get(name);
 	}
 	
+	/**
+	 * Solve maze.
+	 * 
+	 * Checks if the sent starting position already exists in a previous solution, and if so returns that solution.
+	 * If not, tries to solve the maze.
+	 *
+	 * @param arg the name of the maze to solve, and the positions to solve for
+	 */
 	public void solveMaze(String arg){
 		
 		String[] sp = arg.split(" ");
@@ -209,20 +259,42 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		this.mTOs.put(maze, sols);
 	}
 	
+	/**
+	 * Gets a solution.
+	 *
+	 * @param mazeName the name of the maze
+	 * @return the solution
+	 */
 	public Solution getSolution(String mazeName) {
 		Maze m = nTOm.get(mazeName);
 		ArrayList<Solution> array = mTOs.get(m);
 		return array.get(array.size()-1);
 	}
 	
+	/**
+	 * Gets the positions for the maze.
+	 *
+	 * @param mazeName the name of the maze
+	 * @return the starting and goal positions
+	 */
 	public String getPos(String mazeName){
 		return this.nTOp.get(mazeName);
 	}
 	
+	/**
+	 * Sets the maze generating algorithm.
+	 *
+	 * @param gen the new maze generating algorithm
+	 */
 	public void setMazeGenAlg(MazeGenerator gen){
 		this.mazeGen = gen;
 	}
 	
+	/**
+	 * Sets the solver algorithm.
+	 *
+	 * @param s the new solver algorithm
+	 */
 	public void setSolverAlg(Searcher s){
 		this.searcher = s;
 	}
@@ -236,6 +308,9 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		dm.saveMazeMap(mTOs);
 	}
 	
+	/**
+	 * Save the name to positions map.
+	 */
 	public void savePosMap(){
 		dm.savePosMap(nTOp);
 	}
@@ -251,6 +326,11 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		return dm.loadMazeMap();
 	}
 	
+	/**
+	 * Loads the name to positions map from the DB.
+	 *
+	 * @return the name to positions map
+	 */
 	public Map<String, String> loadPosMap(){
 		return dm.loadPosMap();
 	}
@@ -262,11 +342,24 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		dm.deleteAll();
 	}
 	
+	/**
+	 * Add Observer.
+	 * 
+	 * @param o
+	 *            adds the observer to this the observers list.
+	 */
 	@Override
 	public void addObserver(Observer o) {
 		this.observers.add(o);
 	}
 	
+	/**
+	 * Notify Observers.
+	 * 
+	 * notify the observers.
+	 *
+	 * @param arg An object to pass to the observers.
+	 */
 	@Override
 	public void notifyObservers(Object obj) {
 		for (Observer observer : observers) {
@@ -274,6 +367,9 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 		}
 	}
 
+	/** Stop.
+	 * Saves the objects in the DB and shutsdown the Data manager.
+	 */
 	@Override
 	public void stop() {
 		if(dm!=null){

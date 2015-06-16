@@ -1,5 +1,4 @@
 package boot;
-
 import model.MazeClientHandler;
 import model.Model;
 import model.ServerModel;
@@ -8,8 +7,9 @@ import view.View;
 import controller.Controller;
 import controller.Preferences;
 
-public class Run {
 
+public class Run {
+	
 	public static void main(String[] args) {
 		Preferences pref = new Preferences();
 		pref.loadPreferences();
@@ -24,5 +24,4 @@ public class Run {
 		v.start();
 		m.stop();
 	}
-
 }

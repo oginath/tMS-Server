@@ -14,13 +14,26 @@ import org.eclipse.swt.widgets.Text;
 
 import controller.Controller;
 
+/**
+ * The Class ServerView.
+ */
 public class ServerView extends BasicWindow implements View {
 
+	/** The controller. */
 	Controller c;
+	
+	/** Text widgets. */
 	Text clientsText, console ,calcMazes , calcSolutions;
+	
+	/** The current amount of clients, mazes and solutions. */
 	int numOfClients, numOfMazes, numOfSolutions;
+	
+	/** String builder used in the console and status. */
 	StringBuilder stringB;
 
+	/**
+	 * Instantiates a new server view.
+	 */
 	public ServerView() {
 		super();
 		numOfClients = 0;
@@ -29,6 +42,9 @@ public class ServerView extends BasicWindow implements View {
 		stringB = new StringBuilder();
 	}
 
+	/**
+	 * Instantiates the window, lays out the widgets.
+	 */
 	@Override
 	public void initWidgets() {
 		shell.setLayout(new GridLayout(2, false));
@@ -68,6 +84,9 @@ public class ServerView extends BasicWindow implements View {
 
 	}
 
+	/**
+	 * Writes the number and details of the currently connected clients.
+	 */
 	@Override
 	public void writeClientText() {
 		display.asyncExec(new Runnable() {
@@ -91,6 +110,9 @@ public class ServerView extends BasicWindow implements View {
 		});
 	}
 	
+	/**
+	 * Writes the number of calculated mazes in this session.
+	 */
 	@Override
 	public void writeCalculatedMazes(){
 		display.asyncExec(new Runnable() {
@@ -103,6 +125,10 @@ public class ServerView extends BasicWindow implements View {
 
 		});
 	}
+	
+	/**
+	 * Writes the number of calculated solutions in this session.
+	 */
 	@Override
 	public void writeCalculatedSolutions(){
 		display.asyncExec(new Runnable() {
@@ -116,6 +142,11 @@ public class ServerView extends BasicWindow implements View {
 		});
 	}
 	
+	/**
+	 * Writes the current status to the console with a time stamp.
+	 * 
+	 * @param string The status to display.
+	 */
 	@Override
 	public void writeToConsole(String string) {
 		display.asyncExec(new Runnable() {
@@ -131,11 +162,18 @@ public class ServerView extends BasicWindow implements View {
 		});
 	}
 
+	/**
+	 * Opens the window, uses inherited method Run.
+	 * @see BasicWindow
+	 */
 	@Override
 	public void start() {
 		this.run();
 	}
 
+	/**
+	 * Sets the controller.
+	 */
 	@Override
 	public void setController(Controller c) {
 		this.c = c;

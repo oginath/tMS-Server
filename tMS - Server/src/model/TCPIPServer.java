@@ -8,13 +8,29 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The Class TCPIPServer.
+ */
 public class TCPIPServer{
 
+	/** The port. */
 	private int port;
+	
+	/** The boolean stopped, informs across threads if the server has been stopped. */
 	private volatile boolean stopped;
+	
+	/** The ClientHandler object. */
 	private ClientHandler ch;
+	
+	/** The Client list. */
 	public List<String> cList;
 
+	/**
+	 * Instantiates a new TCPIP server.
+	 *
+	 * @param port the port to listen to
+	 * @param ch the Client Handler object
+	 */
 	public TCPIPServer(int port, ClientHandler ch) {
 		this.port = port;
 		this.ch = ch;
@@ -22,6 +38,13 @@ public class TCPIPServer{
 		this.cList = new ArrayList<String>();
 	}
 
+	/**
+	 * Start the server.
+	 *
+	 * Searches for clients every 500 ms, while the server has not been stopped.
+	 *
+	 * @param numOfClients the number of clients in the thread pool
+	 */
 	public void startServer(int numOfClients){
 		ServerSocket server = null;
 		try {
@@ -52,7 +75,7 @@ public class TCPIPServer{
 		try {
 			threadPool.shutdown();
 			try {
-				if(threadPool.awaitTermination(100, TimeUnit.MILLISECONDS));
+				if(threadPool.awaitTermination(50, TimeUnit.MILLISECONDS));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -61,10 +84,18 @@ public class TCPIPServer{
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
+	/**
+	 * Stop server.
+	 */
 	public void stopServer() {
 		stopped = true;
 	}
 	
+	/**
+	 * Gets the clients.
+	 *
+	 * @return the clients
+	 */
 	public List<String> getClients(){
 		return this.cList;
 	}
