@@ -55,7 +55,7 @@ public class DataManager {
 	public DataManager() throws JDBCConnectionException {
 		Logger log = Logger.getLogger("org.hibernate");
 		log.setLevel(Level.SEVERE);
-		String filePath = "resources/hibernate.cfg.xml";
+		String filePath = "server_resources/hibernate.cfg.xml";
 		File f = new File(filePath);
 		Configuration config = new Configuration();
 		config.configure(f);

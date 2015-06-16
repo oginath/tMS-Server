@@ -358,7 +358,7 @@ public class MazeClientHandler extends Observable implements ClientHandler {
 	 * 
 	 * notify the observers.
 	 *
-	 * @param arg An object to pass to the observers.
+	 * @param obj An object to pass to the observers.
 	 */
 	@Override
 	public void notifyObservers(Object obj) {

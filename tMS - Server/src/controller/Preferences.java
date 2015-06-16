@@ -161,7 +161,7 @@ public class Preferences implements Serializable {
 	 */
 	public void loadPreferences(){
 		try {
-			XMLDecoder xmlDe = new XMLDecoder(new FileInputStream("resources/preferences.xml"));
+			XMLDecoder xmlDe = new XMLDecoder(new FileInputStream("server_resources/preferences.xml"));
 			Preferences p  = (Preferences) xmlDe.readObject();
 			xmlDe.close();
 			
@@ -184,7 +184,7 @@ public class Preferences implements Serializable {
 	 */
 	public void savePreferences(){
 		try {
-			XMLEncoder xmlEn = new XMLEncoder(new FileOutputStream("resources/preferences.xml"));
+			XMLEncoder xmlEn = new XMLEncoder(new FileOutputStream("server_resources/preferences.xml"));
 			xmlEn.writeObject(this);
 			xmlEn.close();
 		} catch (FileNotFoundException e) {
